@@ -1,91 +1,82 @@
-// Copyright 2021 PickNik Inc.
-//
-// Redistribution and use in source and binary forms, with or without
-// modification, are permitted provided that the following conditions are met:
-//
-//    * Redistributions of source code must retain the above copyright
-//      notice, this list of conditions and the following disclaimer.
-//
-//    * Redistributions in binary form must reproduce the above copyright
-//      notice, this list of conditions and the following disclaimer in the
-//      documentation and/or other materials provided with the distribution.
-//
-//    * Neither the name of the PickNik Inc. nor the names of its
-//      contributors may be used to endorse or promote products derived from
-//      this software without specific prior written permission.
-//
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-// ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
-// LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-// CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-// POSSIBILITY OF SUCH DAMAGE.
+/*********************************************************************
+ * Software License Agreement (BSD License)
+ *
+ *  Copyright (c) 2017, PickNik Consulting
+ *  All rights reserved.
+ *
+ *  Redistribution and use in source and binary forms, with or without
+ *  modification, are permitted provided that the following conditions
+ *  are met:
+ *
+ *   * Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *   * Redistributions in binary form must reproduce the above
+ *     copyright notice, this list of conditions and the following
+ *     disclaimer in the documentation and/or other materials provided
+ *     with the distribution.
+ *   * Neither the name of the Univ of CO, Boulder nor the names of its
+ *     contributors may be used to endorse or promote products derived
+ *     from this software without specific prior written permission.
+ *
+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ *  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ *  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ *  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ *  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ *  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ *  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ *  POSSIBILITY OF SUCH DAMAGE.
+ *********************************************************************/
 
 /* Author: Dave Coleman
    Desc:   Demo implementation of rviz_visual_tools
            To use, add a Rviz Marker Display subscribed to topic /rviz_visual_tools
 */
 
-// For visualizing things in rviz
-#include <rviz_visual_tools/rviz_visual_tools.hpp>
-#include <rviz_visual_tools/remote_control.hpp>
-
 // ROS
-#include <rclcpp/rclcpp.hpp>
+#include <ros/ros.h>
+
+// For visualizing things in rviz
+#include <rviz_visual_tools/rviz_visual_tools.h>
 
 // C++
 #include <string>
 #include <vector>
 
-// Msgs
-#include <geometry_msgs/msg/vector3.hpp>
-
-using namespace std::chrono_literals;
-
 namespace rvt = rviz_visual_tools;
 
 namespace rviz_visual_tools
 {
-class RvizVisualToolsDemo : public rclcpp::Node
+class RvizVisualToolsDemo
 {
 private:
+  // A shared node handle
+  ros::NodeHandle nh_;
+
   // For visualizing things in rviz
   rvt::RvizVisualToolsPtr visual_tools_;
+
+  std::string name_;
 
 public:
   /**
    * \brief Constructor
    */
-  explicit RvizVisualToolsDemo(const rclcpp::NodeOptions& options = rclcpp::NodeOptions())
-    : Node("rviz_demo", options)
+  RvizVisualToolsDemo() : name_("rviz_demo")
   {
-    visual_tools_.reset(
-        new rvt::RvizVisualTools("world", "/rviz_visual_tools", dynamic_cast<rclcpp::Node*>(this)));
-    // create publisher before waiting
-    visual_tools_->loadMarkerPub();
-    bool has_sub = visual_tools_->waitForMarkerSub(10.0);
-    if (!has_sub)
-      RCLCPP_INFO(get_logger(), "/rviz_visual_tools does not have a subscriber after 10s. "
-                                "Visualizations may be lost");
+    visual_tools_.reset(new rvt::RvizVisualTools("world", "/rviz_visual_tools"));
+    visual_tools_->loadMarkerPub();  // create publisher before waiting
+
+    ROS_INFO("Sleeping 5 seconds before running demo");
+    ros::Duration(5.0).sleep();
 
     // Clear messages
     visual_tools_->deleteAllMarkers();
     visual_tools_->enableBatchPublishing();
-  }
-
-  auto getRemoteControl()
-  {
-    return visual_tools_->getRemoteControl();
-  }
-
-  void prompt(const std::string& msg)
-  {
-    visual_tools_->prompt(msg);
   }
 
   void publishLabelHelper(const Eigen::Isometry3d& pose, const std::string& label)
@@ -108,12 +99,12 @@ public:
     double step;
 
     // --------------------------------------------------------------------
-    RCLCPP_INFO(get_logger(), "Displaying range of colors red->green");
+    ROS_INFO_STREAM_NAMED(name_, "Displaying range of colors red->green");
     step = 0.02;
     for (double i = 0; i <= 1.0; i += 0.02)
     {
-      geometry_msgs::msg::Vector3 scale = visual_tools_->getScale(MEDIUM);
-      std_msgs::msg::ColorRGBA color = visual_tools_->getColorScale(i);
+      geometry_msgs::Vector3 scale = visual_tools_->getScale(MEDIUM);
+      std_msgs::ColorRGBA color = visual_tools_->getColorScale(i);
       visual_tools_->publishSphere(visual_tools_->convertPose(pose1), color, scale, "Sphere");
       if (i == 0.0)
       {
@@ -124,7 +115,7 @@ public:
     visual_tools_->trigger();
 
     // --------------------------------------------------------------------
-    RCLCPP_INFO(get_logger(), "Displaying Coordinate Axis");
+    ROS_INFO_STREAM_NAMED(name_, "Displaying Coordinate Axis");
     pose1.translation().x() = 0;
     y += space_between_rows;
     pose1.translation().y() = y;
@@ -145,7 +136,7 @@ public:
     visual_tools_->trigger();
 
     // --------------------------------------------------------------------
-    RCLCPP_INFO(get_logger(), "Displaying Arrows");
+    ROS_INFO_STREAM_NAMED(name_, "Displaying Arrows");
     pose1 = Eigen::Isometry3d::Identity();
     y += space_between_rows;
     pose1.translation().y() = y;
@@ -164,7 +155,7 @@ public:
     visual_tools_->trigger();
 
     // --------------------------------------------------------------------
-    RCLCPP_INFO(get_logger(), "Displaying Rectangular Cuboid");
+    ROS_INFO_STREAM_NAMED(name_, "Displaying Rectangular Cuboid");
     double cuboid_max_size = 0.075;
     double cuboid_min_size = 0.01;
     pose1 = Eigen::Isometry3d::Identity();
@@ -191,7 +182,7 @@ public:
     visual_tools_->trigger();
 
     // --------------------------------------------------------------------
-    RCLCPP_INFO(get_logger(), "Displaying Lines");
+    ROS_INFO_STREAM_NAMED(name_, "Displaying Lines");
     double line_max_size = 0.075;
     double line_min_size = 0.01;
     pose1 = Eigen::Isometry3d::Identity();
@@ -218,7 +209,7 @@ public:
     visual_tools_->trigger();
 
     // --------------------------------------------------------------------
-    RCLCPP_INFO(get_logger(), "Displaying Cylinder");
+    ROS_INFO_STREAM_NAMED(name_, "Displaying Cylinder");
     pose1 = Eigen::Isometry3d::Identity();
     y += space_between_rows;
     pose1.translation().y() = y;
@@ -237,7 +228,7 @@ public:
     visual_tools_->trigger();
 
     // --------------------------------------------------------------------
-    RCLCPP_INFO(get_logger(), "Displaying Axis Cone");
+    ROS_INFO_STREAM_NAMED(name_, "Displaying Axis Cone");
     pose1 = Eigen::Isometry3d::Identity();
     y += space_between_rows;
     pose1.translation().y() = y;
@@ -260,7 +251,7 @@ public:
     visual_tools_->trigger();
 
     // --------------------------------------------------------------------
-    RCLCPP_INFO(get_logger(), "Displaying Wireframe Cuboid");
+    ROS_INFO_STREAM_NAMED(name_, "Displaying Wireframe Cuboid");
     pose1 = Eigen::Isometry3d::Identity();
     y += space_between_rows;
     pose1.translation().y() = y;
@@ -283,7 +274,7 @@ public:
     visual_tools_->trigger();
 
     // --------------------------------------------------------------------
-    RCLCPP_INFO(get_logger(), "Displaying Sized Wireframe Cuboid");
+    ROS_INFO_STREAM_NAMED(name_, "Displaying Sized Wireframe Cuboid");
     pose1 = Eigen::Isometry3d::Identity();
     y += space_between_rows;
     pose1.translation().y() = y;
@@ -303,7 +294,7 @@ public:
     visual_tools_->trigger();
 
     // --------------------------------------------------------------------
-    RCLCPP_INFO(get_logger(), "Displaying Planes");
+    ROS_INFO_STREAM_NAMED(name_, "Displaying Planes");
     pose1 = Eigen::Isometry3d::Identity();
     y += space_between_rows;
     pose1.translation().y() = y;
@@ -324,18 +315,17 @@ public:
     }
     visual_tools_->trigger();
 
-    /* TODO(mlautman): port graph_msgs
-    // // --------------------------------------------------------------------
-    // RCLCPP_INFO(get_logger(), "Displaying Graph");
+    // --------------------------------------------------------------------
+    ROS_INFO_STREAM_NAMED(name_, "Displaying Graph");
     pose1 = Eigen::Isometry3d::Identity();
     y += space_between_rows;
     pose1.translation().y() = y;
     step = 0.1;
-    graph_msgs::msg::GeometryGraph graph;
+    graph_msgs::GeometryGraph graph;
     for (double i = 0; i <= 1.0; i += step)
     {
       graph.nodes.push_back(visual_tools_->convertPose(pose1).position);
-      graph_msgs::msg::Edges edges;
+      graph_msgs::Edges edges;
       if (i > 0)
       {
         edges.node_ids.push_back(0);
@@ -352,7 +342,6 @@ public:
     }
     visual_tools_->publishGraph(graph, rvt::ORANGE, 0.005);
     visual_tools_->trigger();
-    */
 
     // --------------------------------------------------------------------
     // TODO(davetcoleman): publishMesh
@@ -361,7 +350,7 @@ public:
     // TODO(davetcoleman): publishPolygon
 
     // --------------------------------------------------------------------
-    RCLCPP_INFO(get_logger(), "Displaying Labeled Coordinate Axis");
+    ROS_INFO_STREAM_NAMED(name_, "Displaying Labeled Coordinate Axis");
     pose1.translation().x() = 0;
     y += space_between_rows;
     pose1.translation().y() = y;
@@ -383,7 +372,7 @@ public:
     visual_tools_->trigger();
 
     // --------------------------------------------------------------------
-    RCLCPP_INFO(get_logger(), "Displaying Multi-Color Path");
+    ROS_INFO_STREAM_NAMED(name_, "Displaying Multi-Color Path");
     pose1 = Eigen::Isometry3d::Identity();
     pose2 = Eigen::Isometry3d::Identity();
     y += space_between_rows;
@@ -391,7 +380,7 @@ public:
     step = 0.1;
 
     EigenSTL::vector_Vector3d path;
-    std::vector<rviz_visual_tools::Colors> colors;
+    std::vector<rviz_visual_tools::colors> colors;
     unsigned index(0);
     for (double i = 0; i < 1.0; i += step)
     {
@@ -418,7 +407,7 @@ public:
     visual_tools_->trigger();
 
     // --------------------------------------------------------------------
-    RCLCPP_INFO(get_logger(), "Displaying ABCD Plane");
+    ROS_INFO_STREAM_NAMED(name_, "Displaying ABCD Plane");
     double x_width = 0.15;
     double y_width = 0.05;
 
@@ -450,14 +439,14 @@ public:
   }
 
   /** \brief Compare sizes of markers using all MEDIUM-scale markers */
-  void testSize(double& x_location, Scales scale)
+  void testSize(double& x_location, scales scale)
   {
     // Create pose
     Eigen::Isometry3d pose1 = Eigen::Isometry3d::Identity();
     Eigen::Isometry3d pose2 = Eigen::Isometry3d::Identity();
 
     // Reusable vector of 2 colors
-    std::vector<Colors> colors;
+    std::vector<colors> colors;
     colors.push_back(RED);
     colors.push_back(GREEN);
 
@@ -469,9 +458,8 @@ public:
 
     // Show test label
     pose1.translation().x() = x_location - 0.1;
-    visual_tools_->publishText(
-        pose1, "Testing consistency of " + visual_tools_->scaleToString(scale) + " marker scale",
-        WHITE, XLARGE, false);
+    visual_tools_->publishText(pose1, "Testing consistency of " + visual_tools_->scaleToString(scale) + " marker scale",
+                               WHITE, XLARGE, false);
 
     pose1.translation().x() = x_location;
 
@@ -582,7 +570,7 @@ public:
   /** \brief Compare every size range */
   void testSizes(double& x_location)
   {
-    RCLCPP_INFO(get_logger(), "Testing sizes of marker scale");
+    ROS_INFO_STREAM_NAMED(name_, "Testing sizes of marker scale");
 
     // Create pose
     Eigen::Isometry3d pose1 = Eigen::Isometry3d::Identity();
@@ -596,13 +584,8 @@ public:
     pose2.translation().x() = x_location;
 
     // Sphere
-    for (Scales scale = XXXXSMALL; scale <= XXXXLARGE; /*inline*/)
+    for (scales scale = XXXXSMALL; scale <= XXXXLARGE; /*inline*/)
     {
-      pose1.translation().y() += visual_tools_->getScale(scale).x + 0.1;
-
-      // Text location
-      pose2.translation().y() = pose1.translation().y();
-      pose2.translation().x() = x_location + visual_tools_->getScale(scale).x * 1.3;
       if (scale == MEDIUM)
       {
         visual_tools_->publishSphere(pose1, GREEN, scale);
@@ -611,10 +594,14 @@ public:
       {
         visual_tools_->publishSphere(pose1, GREY, scale);
       }
-      visual_tools_->publishText(pose2, "Size " + visual_tools_->scaleToString(scale), WHITE, scale,
-                                 false);
+      visual_tools_->publishText(pose2, "Size " + visual_tools_->scaleToString(scale), WHITE, scale, false);
 
-      scale = static_cast<Scales>(static_cast<int>(scale) + 1);
+      scale = static_cast<scales>(static_cast<int>(scale) + 1);
+      pose1.translation().y() += visual_tools_->getScale(scale).x + 0.1;
+
+      // Text location
+      pose2.translation().y() = pose1.translation().y();
+      pose2.translation().x() = x_location + visual_tools_->getScale(scale).x * 1.3;
     }
 
     // Display test
@@ -627,45 +614,24 @@ public:
 
 }  // namespace rviz_visual_tools
 
-int main(int argc, char* argv[])
+int main(int argc, char** argv)
 {
-  // Force flush of the stdout buffer.
-  setvbuf(stdout, NULL, _IONBF, BUFSIZ);  // NOLINT
-
-  // Initialize any global resources needed by the middleware and the client library.
-  // This will also parse command line arguments one day (as of Beta 1 they are not used).
-  // You must call this before using any other part of the ROS system.
-  // This should be called once per process.
-  auto args = rclcpp::init_and_remove_ros_arguments(argc, argv);
-
-  RCLCPP_INFO(rclcpp::get_logger("rviz_demo"), "Visual Tools Demo");
-
-  // Create an executor that will be responsible for execution of callbacks for a set of nodes.
-  // With this version, all callbacks will be called from within this thread (the main one).
-  auto executor = std::make_shared<rclcpp::executors::SingleThreadedExecutor>();
-
-  // Create demo node
-  rclcpp::NodeOptions options = rclcpp::NodeOptions().arguments(args);
-  auto demo = std::make_shared<rviz_visual_tools::RvizVisualToolsDemo>(options);
-
-  // Initialize RemoteControl
-  auto remote_control = demo->getRemoteControl();
+  ros::init(argc, argv, "visual_tools_demo");
+  ROS_INFO_STREAM("Visual Tools Demo");
 
   // Allow the action server to recieve and send ros messages
-  executor->add_node(demo);
-  std::thread([executor]() { executor->spin(); }).detach();
+  ros::AsyncSpinner spinner(1);
+  spinner.start();
 
-  demo->prompt("Click 'Next' using the RvizVisualToolsGui dashboard!");
+  rviz_visual_tools::RvizVisualToolsDemo demo;
 
   double x_location = 0;
-  demo->testRows(x_location);
-  demo->testSize(x_location, rviz_visual_tools::MEDIUM);
-  demo->testSize(x_location, rviz_visual_tools::LARGE);
-  demo->testSizes(x_location);
+  demo.testRows(x_location);
+  demo.testSize(x_location, rviz_visual_tools::MEDIUM);
+  demo.testSize(x_location, rviz_visual_tools::LARGE);
+  demo.testSizes(x_location);
 
-  executor->remove_node(demo);
-
-  RCLCPP_INFO(rclcpp::get_logger("rviz_demo"), "Shutting down.");
+  ROS_INFO_STREAM("Shutting down.");
 
   return 0;
 }

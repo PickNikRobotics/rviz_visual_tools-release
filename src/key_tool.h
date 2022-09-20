@@ -27,76 +27,40 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <OgreRay.h>
-#include <OgreVector3.h>
+#pragma once
 
-// Rviz
-#include <rviz/display_context.h>
-#include <rviz/load_resource.h>
-#include <rviz/properties/bool_property.h>
-#include <rviz/properties/string_property.h>
-#include <rviz/view_controller.h>
-#include <rviz/viewport_mouse_event.h>
+#ifndef Q_MOC_RUN  // See: https://bugreports.qt-project.org/browse/QTBUG-22829
 
-// this package
-#include "key_tool.h"
+#include <rviz/tool.h>
+#include <rviz/default_plugin/tools/move_tool.h>
 
-// C++
-#include <sstream>
+#include <QCursor>
+#include <QObject>
+#endif
+
+#include <rviz_visual_tools/remote_reciever.h>
 
 namespace rviz_visual_tools
 {
-KeyTool::KeyTool() = default;
-
-KeyTool::~KeyTool() = default;
-
-void KeyTool::onInitialize()
+class KeyTool : public rviz::Tool
 {
-  move_tool_.initialize(context_);
-}
+  Q_OBJECT
+public:
+  KeyTool();
+  ~KeyTool() override;
 
-void KeyTool::activate()
-{
-}
+  void onInitialize() override;
 
-void KeyTool::deactivate()
-{
-}
+  void activate() override;
+  void deactivate() override;
 
-int KeyTool::processKeyEvent(QKeyEvent* event, rviz::RenderPanel* panel)
-{
-  // move forward / backward
-  switch (event->key())
-  {
-    case Qt::Key_N:
-      remote_reciever_.publishNext();
-      return 1;
-    case Qt::Key_A:
-    case Qt::Key_C:
-      remote_reciever_.publishContinue();
-      return 1;
-    case Qt::Key_B:
-      remote_reciever_.publishBreak();
-      return 1;
-    case Qt::Key_S:
-      remote_reciever_.publishStop();
-      return 1;
-  }
+  int processKeyEvent(QKeyEvent* event, rviz::RenderPanel* panel) override;
+  int processMouseEvent(rviz::ViewportMouseEvent& event) override;
 
-  return move_tool_.processKeyEvent(event, panel);
-}
+public Q_SLOTS:
 
-int KeyTool::processMouseEvent(rviz::ViewportMouseEvent& event)
-{
-  int flags = 0;
-
-  move_tool_.processMouseEvent(event);
-  setCursor(move_tool_.getCursor());
-
-  return flags;
-}
-
+protected:
+  rviz::MoveTool move_tool_;
+  RemoteReciever remote_reciever_;
+};
 }  // namespace rviz_visual_tools
-
-#include <pluginlib/class_list_macros.hpp>
-PLUGINLIB_EXPORT_CLASS(rviz_visual_tools::KeyTool, rviz::Tool)

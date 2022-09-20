@@ -2,69 +2,47 @@
 Changelog for package rviz_visual_tools
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-4.1.2 (2021-12-13)
+3.9.2 (2022-09-20)
 ------------------
-* Fix faulty templated constructor (`#211 <https://github.com/PickNikRobotics/rviz_visual_tools/issues/211>`_)
-* Make sure to add all dependencies to the package.xml (`#209 <https://github.com/PickNikRobotics/rviz_visual_tools/issues/209>`_)
-  Otherwise it will fail to build on the buildfarm.
-* Contributors: Chris Lalancette, Vatan Aksoy Tezer
+* Cleanup for new Ubuntu versions (`#215 <https://github.com/PickNikRobotics/rviz_visual_tools/issues/215>`_)
+* spin independent thread for RemoteControl (`#224 <https://github.com/PickNikRobotics/rviz_visual_tools/issues/224>`_)
+  Avoid deadlocks and cross-thread effects with other callbacks.
+* Migrate CI to Github Actions (`#197 <https://github.com/PickNikRobotics/rviz_visual_tools/issues/197>`_)
+* migrate to <random> (`#195 <https://github.com/PickNikRobotics/rviz_visual_tools/issues/195>`_)
+* Fix bugtracker typo (`#186 <https://github.com/PickNikRobotics/rviz_visual_tools/issues/186>`_)
+* Contributors: Jochen Sprickerhof, Michael Görner, Nathan Brooks, Vatan Aksoy Tezer
 
-4.1.1 (2021-10-07)
+3.9.1 (2020-10-09)
 ------------------
-* Re-enable RemoteControl functionality (`#205 <https://github.com/PickNikRobotics/rviz_visual_tools/issues/205>`_)
-  * use condition_variable to be more thread safe
-  * Drop executor from constructor, deprecate old one
-  * Fix RemoteControl usage in demo
-  * Use SystemDefaultsQOS for RemoteControl subscriber
-  * Add RvizVisualToolsGui dashboard to rviz config, correct view
-* Add pluginlib dependency. (`#203 <https://github.com/PickNikRobotics/rviz_visual_tools/issues/203>`_)
-* Fix package dependencies and cmake export (`#202 <https://github.com/PickNikRobotics/rviz_visual_tools/issues/202>`_)
-* Rename node_executable to executable (`#200 <https://github.com/PickNikRobotics/rviz_visual_tools/issues/200>`_)
-* Contributors: Davide Faconti, Henning Kayser, Jafar Abdi, Steven! Ragnarök, Vatan Aksoy Tezer
+* [maint] add soname versions to libraries (`#166 <https://github.com/tylerjw/rviz_visual_tools/issues/166>`_)
+* [maint] Apply clang-format-10 (`#173 <https://github.com/tylerjw/rviz_visual_tools/issues/173>`_)
+* Contributors: Tyler Weaver
 
-4.1.0 (2021-09-14)
+3.9.0 (2020-09-05)
 ------------------
-* Fixes for new ros2 branch (`#198 <https://github.com/PickNikRobotics/rviz_visual_tools/issues/198>`_)
-* Fix include deprecation warning
-* Enable Galactic and Rolling CI (`#190 <https://github.com/PickNikRobotics/rviz_visual_tools/issues/190>`_)
-  * minor compile fixes
-* Fixes & improvements for deleting markers (`#188 <https://github.com/PickNikRobotics/rviz_visual_tools/issues/188>`_)
-  * Added RvizVisualTools method to delete all markers in a namespace
-  * Fixed deleteAllMarkers for all namespaces
-  * Added getters for marker ID's
-* Move waitForSubscriber function to header file (`#185 <https://github.com/PickNikRobotics/rviz_visual_tools/issues/185>`_)
-* Contributors: Henning Kayser, Jafar Abdi, Nathan Brooks, Vatan Aksoy Tezer, Wyatt Rees
-
-4.0.0 (2021-04-09)
-------------------
-* Fix warning about deprecation (`#180 <https://github.com/PickNikRobotics/rviz_visual_tools/issues/180>`_)
-  rclcpp::executor::FutureReturnCode was removed
-* Update to offer shared_ptr to create_timer
-* Fix rviz_visual_tools_gui (`#147 <https://github.com/PickNikRobotics/rviz_visual_tools/issues/147>`_)
-* Compilation for Windows (`#143 <https://github.com/PickNikRobotics/rviz_visual_tools/issues/143>`_)
-* Remove stl file in preparation for LFS setup (`#140 <https://github.com/PickNikRobotics/rviz_visual_tools/issues/140>`_)
-* Add function deleteMarker: deletes marker for given namespace and id (`#137 <https://github.com/PickNikRobotics/rviz_visual_tools/issues/137>`_)
-* fix waitForSubscriber time (`#142 <https://github.com/PickNikRobotics/rviz_visual_tools/issues/142>`_)
-* Eloquent cleanup (`#135 <https://github.com/PickNikRobotics/rviz_visual_tools/issues/135>`_)
-  * some misc cleanup of the imarker simple lib
-  * actually reset marker counts
-  * changes for using IMarker simple as a library
-* Fix rviz warnings about scale and uninitialized quaternions (`#129 <https://github.com/PickNikRobotics/rviz_visual_tools/issues/129>`_)
-* Normalize interactive marker quaternions. (`#132 <https://github.com/PickNikRobotics/rviz_visual_tools/issues/132>`_)
-* normalize before publish (`#131 <https://github.com/PickNikRobotics/rviz_visual_tools/issues/131>`_)
-* New helper function getIdentityPose() (`#122 <https://github.com/PickNikRobotics/rviz_visual_tools/issues/122>`_)
-* For ABCD planes: better comments, ensure the plane equation is satisfied. (`#120 <https://github.com/PickNikRobotics/rviz_visual_tools/issues/120>`_)
-  Co-Authored-By: Henning Kayser <henningkayser@picknik.ai>
-* Make `rviz_visual_tools` publish triangle mesh and `tf_visual_tools` clean published transforms (`#117 <https://github.com/PickNikRobotics/rviz_visual_tools/issues/117>`_)
-  * Add `clearAllTransform` method to tf_visual_tools
-  * Add new function to publish mesh marker from triangles and vertices
-* Publish plane from Ax+By+Cz+D=0 equation (`#119 <https://github.com/PickNikRobotics/rviz_visual_tools/issues/119>`_)
-* Fixed publishCylinder namespace (`#109 <https://github.com/PickNikRobotics/rviz_visual_tools/issues/109>`_)
-* Remove default arguments to make function calls not ambiguous (`#112 <https://github.com/PickNikRobotics/rviz_visual_tools/issues/112>`_)
-* Initialize quaternions in demo to avoid warning (`#111 <https://github.com/PickNikRobotics/rviz_visual_tools/issues/111>`_)
-* Fix node type in demo launch files (`#110 <https://github.com/PickNikRobotics/rviz_visual_tools/issues/110>`_)
-* Use LOGNAME for logging re:moveit styel (`#106 <https://github.com/PickNikRobotics/rviz_visual_tools/issues/106>`_)
-* Contributors: AndyZe, Bjar Ne, Dave Coleman, Jafar Abdi, Mike Lautman, Mori, MoriKen, Nathan Brooks, Sean Yen, Victor Lamoine, Yu Yan, d-walsh, hshose
+* [feature] Add optional parent frame to iMarker (`#159 <https://github.com/tylerjw/rviz_visual_tools/issues/159>`_)
+* [feature] Publish cuboid with size as a vector3 or Eigen::Vector3d  (`#125 <https://github.com/tylerjw/rviz_visual_tools/issues/125>`_)
+* [feature] Normalize interactive marker quaternions. (`#132 <https://github.com/tylerjw/rviz_visual_tools/issues/132>`_)
+* [feature] normalize before publish (`#131 <https://github.com/tylerjw/rviz_visual_tools/issues/131>`_)
+* [feature] New helper function getIdentityPose() (`#122 <https://github.com/tylerjw/rviz_visual_tools/issues/122>`_)
+* [feature] Windows bring up. (`#116 <https://github.com/tylerjw/rviz_visual_tools/issues/116>`_)
+* [feature] For ABCD planes: better comments, ensure the plane equation is satisfied. (`#120 <https://github.com/tylerjw/rviz_visual_tools/issues/120>`_)
+* [feature] Make `rviz_visual_tools` publish triangle mesh and `tf_visual_tools` clean published transforms (`#117 <https://github.com/tylerjw/rviz_visual_tools/issues/117>`_)
+* [feature] Publish plane from Ax+By+Cz+D=0 equation (`#119 <https://github.com/tylerjw/rviz_visual_tools/issues/119>`_)
+* [feature] Remove default arguments to make function calls not ambiguous (`#112 <https://github.com/tylerjw/rviz_visual_tools/issues/112>`_)
+* [feature] Initizalize quaternions in demo to avoid warning (`#111 <https://github.com/tylerjw/rviz_visual_tools/issues/111>`_)
+* [fix] rviz warnings about scale and uninitialized quaternions (`#129 <https://github.com/tylerjw/rviz_visual_tools/issues/129>`_)
+* [fix] publishCylinder namespace (`#109 <https://github.com/tylerjw/rviz_visual_tools/issues/109>`_)
+* [fix] node type in demo launch files (`#110 <https://github.com/tylerjw/rviz_visual_tools/issues/110>`_)
+* [maint] Adding missing dependency (interactive_markers) (`#168 <https://github.com/tylerjw/rviz_visual_tools/issues/168>`_)
+* [maint] clang-tidy (`#158 <https://github.com/tylerjw/rviz_visual_tools/issues/158>`_)
+* [maint] replace tf_conversions with tf2 (`#151 <https://github.com/tylerjw/rviz_visual_tools/issues/151>`_)
+* [maint] bump cmake version (`#150 <https://github.com/tylerjw/rviz_visual_tools/issues/150>`_)
+* [maint] remove trailing whitespaces (`#130 <https://github.com/tylerjw/rviz_visual_tools/issues/130>`_)
+* [maint] Apply clang-tidy (`#127 <https://github.com/tylerjw/rviz_visual_tools/issues/127>`_)
+* [maint] Switch to moveit_ci, apply clang-format (`#124 <https://github.com/tylerjw/rviz_visual_tools/issues/124>`_)
+* [maint] Use LOGNAME for logging re:moveit styel (`#106 <https://github.com/tylerjw/rviz_visual_tools/issues/106>`_)
+* Contributors: AndyZe, Bjar Ne, Dave Coleman, Jafar Abdi, JafarAbdi, Michael Görner, Mike Lautman, Sean Yen, Victor Lamoine, Yu, Yan, d-walsh
 
 3.7.0 (2018-11-26)
 ------------------
