@@ -186,7 +186,7 @@ tracks:
       :{release_inc} --os-name fedora
     - git-bloom-generate -y rosrpm --prefix release/:{ros_distro} :{ros_distro} -i
       :{release_inc} --os-name rhel
-    devel_branch: noetic-devel
+    devel_branch: master
     last_version: 3.9.1
     name: rviz_visual_tools
     patches: null
