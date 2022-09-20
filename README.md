@@ -1,3 +1,26 @@
+## rviz_visual_tools (noetic) - 3.9.2-1
+
+The packages in the `rviz_visual_tools` repository were released into the `noetic` distro by running `/usr/bin/bloom-release rviz_visual_tools -t noetic -r noetic --edit` on `Tue, 20 Sep 2022 17:35:21 -0000`
+
+The `rviz_visual_tools` package was released.
+
+Version of package(s) in repository `rviz_visual_tools`:
+
+- upstream repository: https://github.com/PickNikRobotics/rviz_visual_tools.git
+- release repository: https://github.com/PickNikRobotics/rviz_visual_tools-release.git
+- rosdistro version: `3.9.1-1`
+- old version: `3.9.1-1`
+- new version: `3.9.2-1`
+
+Versions of tools used:
+
+- bloom version: `0.11.2`
+- catkin_pkg version: `0.5.2`
+- rosdep version: `0.22.1`
+- rosdistro version: `0.9.0`
+- vcstools version: `0.1.42`
+
+
 ## rviz_visual_tools (rolling) - 4.1.2-1
 
 The packages in the `rviz_visual_tools` repository were released into the `rolling` distro by running `/home/jafar/.local/bin/bloom-release rviz_visual_tools -t rolling -r rolling` on `Mon, 13 Dec 2021 06:59:57 -0000`
